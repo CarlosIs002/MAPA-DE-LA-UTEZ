@@ -3,36 +3,54 @@ package com.example.gps.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gps.data.db.LocationPoint
-import com.example.gps.data.db.Trip
-import com.example.gps.data.repository.TripRepository
+import com.example.gps.data.network.Lugar
+import com.example.gps.data.repository.LugarRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
+
+data class LugarDetailState(
+    val lugar: Lugar? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val navigateBack: Boolean = false
+)
 
 class TripDetailViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = TripRepository(application)
+    private val repository = LugarRepository(application)
 
-    private val _trip = MutableStateFlow<Trip?>(null)
-    val trip = _trip.asStateFlow()
+    private val _uiState = MutableStateFlow(LugarDetailState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _route = MutableStateFlow<List<LocationPoint>>(emptyList())
-    val route = _route.asStateFlow()
-
-    fun loadTripDetails(tripId: Long) {
+    fun loadLugar(lugarId: Int) {
         viewModelScope.launch {
-            // Cargar los datos del viaje
-            _trip.value = repository.getTrip(tripId)
-            // Cargar los puntos de la ruta
-            repository.getLocationPointsForTrip(tripId).collect {
-                _route.value = it
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                val lugar = repository.getLugar(lugarId)
+                _uiState.update { it.copy(isLoading = false, lugar = lugar) }
+            } catch (e: IOException) {
+                _uiState.update { it.copy(isLoading = false, error = "Error de red. No se pudo cargar el lugar.") }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = "Error inesperado: ${e.message}") }
             }
         }
     }
 
-    fun deleteTrip(trip: Trip) {
-        viewModelScope.launch {
-            repository.deleteTrip(trip)
+    fun deleteLugar() {
+        _uiState.value.lugar?.id?.let { id ->
+            viewModelScope.launch {
+                _uiState.update { it.copy(isLoading = true, error = null) }
+                try {
+                    repository.deleteLugar(id)
+                    _uiState.update { it.copy(isLoading = false, navigateBack = true) } // ¡Éxito!
+                } catch (e: IOException) {
+                    _uiState.update { it.copy(isLoading = false, error = "Error de red. No se pudo eliminar el lugar.") }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(isLoading = false, error = "Error inesperado: ${e.message}") }
+                }
+            }
         }
     }
 }

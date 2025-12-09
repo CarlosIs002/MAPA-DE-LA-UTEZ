@@ -2,4 +2,11 @@
 <resources>
 
     <style name="Theme.Gps" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- ... (tus otros estilos pueden estar aquí) ... -->
+
+    <!-- ESTILO PARA EL REPRODUCTOR DE VIDEO -->
+    <style name="PlayerTheme" parent="Theme.AppCompat.DayNight">
+        <!-- CAMBIO: Este es el color de acento que usarán los controles -->
+        <item name="colorAccent">#FFC107</item> <!-- Código hexadecimal del color Ámbar -->
+    </style>
 </resources>

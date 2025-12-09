@@ -1,73 +1,90 @@
 package com.example.gps.ui.edit
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.gps.viewmodel.EditTripViewModel
+import com.google.android.gms.location.LocationServices
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditTripScreen(
     navController: NavController,
-    tripId: Long,
-    photoUri: String?,
+    photoUri: String?, // Solo recibe photoUri
     viewModel: EditTripViewModel = viewModel()
 ) {
-    val trip by viewModel.trip.collectAsState()
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    val isNewTrip = photoUri != null
+    // Set photoUri in ViewModel
+    LaunchedEffect(photoUri) {
+        photoUri?.let { viewModel.onImageUriChange(Uri.parse(it)) }
+    }
 
-    LaunchedEffect(tripId) {
-        if (!isNewTrip) { // Si NO es un viaje nuevo, cargamos sus datos
-            viewModel.loadTrip(tripId)
+    // Location permission handling
+    val locationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { granted ->
+            if (granted) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationClient.lastLocation.addOnSuccessListener { location ->
+                        viewModel.onLocationChange(location)
+                    }
+                }
+            }
+        }
+    )
+
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+             locationClient.lastLocation.addOnSuccessListener { location ->
+                viewModel.onLocationChange(location)
+            }
+        }
+    }
+    
+    // Navigate back when done
+    LaunchedEffect(uiState.navigateBack) {
+        if (uiState.navigateBack) {
+            navController.popBackStack()
+            viewModel.onNavigationDone() // Reset state
         }
     }
 
-    LaunchedEffect(trip) {
-        trip?.let {
-            title = it.title
-            description = it.description
-        }
-    }
-
-    Scaffold {
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Nuevo Lugar") }) }
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(it)
+                .padding(padding)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val imageToShow = photoUri ?: trip?.photoUri
-            imageToShow?.let {
+            uiState.imageUri?.let {
                 AsyncImage(
-                    model = Uri.parse(it),
-                    contentDescription = "Foto del viaje",
+                    model = it,
+                    contentDescription = "Foto del lugar",
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16 / 9f),
@@ -75,40 +92,38 @@ fun EditTripScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             OutlinedTextField(
-                value = title,
-                onValueChange = { title = it },
+                value = uiState.titulo,
+                onValueChange = { viewModel.onTituloChange(it) },
                 label = { Text("Título") },
                 modifier = Modifier.fillMaxWidth()
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
+                value = uiState.descripcion,
+                onValueChange = { viewModel.onDescripcionChange(it) },
                 label = { Text("Descripción") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3
+                modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    if (isNewTrip) {
-                        viewModel.saveNewTrip(tripId, photoUri!!, title, description)
-                        // Navegación para un viaje NUEVO: volvemos a la galería, limpiando el stack
-                        navController.navigate("gallery") {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        }
-                    } else {
-                        viewModel.updateTrip(tripId, title, description)
-                        // Navegación para una EDICIÓN: simplemente volvemos atrás
-                        navController.popBackStack()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (isNewTrip) "Guardar Viaje" else "Guardar Cambios")
+            Button(onClick = { viewModel.saveTrip() }, modifier = Modifier.fillMaxWidth()) {
+                Text("Guardar Lugar")
+            }
+
+            if (uiState.isLoading) {
+                Spacer(modifier = Modifier.height(8.dp))
+                CircularProgressIndicator()
+            }
+
+            uiState.error?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(it, color = MaterialTheme.colorScheme.error)
             }
         }
     }

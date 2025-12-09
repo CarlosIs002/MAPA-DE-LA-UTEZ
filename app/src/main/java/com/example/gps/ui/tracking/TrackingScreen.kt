@@ -26,7 +26,7 @@ import com.example.gps.viewmodel.TrackingViewModel
 
 @Composable
 fun TrackingScreen(
-    navController: NavController, // ¡¡¡PARÁMETRO AÑADIDO!!!
+    navController: NavController,
     viewModel: TrackingViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -66,10 +66,8 @@ fun TrackingScreen(
                     if (uiState.isRecording) {
                         // 1. Si está grabando, paramos lógicamente
                         viewModel.onStartStopClick()
-                        // 2. Navegamos a nuestra propia CameraScreen con el ID del viaje
-                        uiState.currentTripId?.let {
-                            navController.navigate("camera/$it")
-                        }
+                        // 2. Navegamos a la cámara. La ruta ya no necesita el ID.
+                        navController.navigate("camera")
                     } else {
                         // Si no está grabando, empezamos
                         viewModel.onStartStopClick()
@@ -84,7 +82,7 @@ fun TrackingScreen(
             }
 
             if (uiState.isRecording) {
-                Text("Grabando recorrido #${uiState.currentTripId}...")
+                Text("Grabando recorrido...")
             }
         }
     }

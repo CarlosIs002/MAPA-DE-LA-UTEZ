@@ -21,12 +21,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +34,9 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// Firma de la función corregida: ya no necesita tripId
 @Composable
-fun CameraScreen(navController: NavController, tripId: Long) {
+fun CameraScreen(navController: NavController) {
     val context = LocalContext.current
     var hasCamPermission by remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -61,10 +57,11 @@ fun CameraScreen(navController: NavController, tripId: Long) {
             CameraView(
                 modifier = Modifier.padding(padding),
                 onPhotoTaken = { photoUri ->
-                    // --- NAVEGACIÓN CORREGIDA ---
                     val encodedUri = Uri.encode(photoUri.toString())
-                    navController.navigate("edit_trip/$tripId?photoUri=$encodedUri") {
-                        popUpTo("camera/$tripId") { inclusive = true }
+                    // Navegación corregida: ya no se pasa el tripId
+                    navController.navigate("edit_trip?photoUri=$encodedUri") {
+                        // La ruta de la cámara ya no tiene un ID
+                        popUpTo("camera") { inclusive = true }
                     }
                 }
             )

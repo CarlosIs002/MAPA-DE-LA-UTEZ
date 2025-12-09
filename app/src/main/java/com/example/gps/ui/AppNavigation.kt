@@ -29,18 +29,16 @@ import com.example.gps.ui.gallery.GalleryScreen
 import com.example.gps.ui.map.MapScreen
 import com.example.gps.ui.tracking.TrackingScreen
 
-// Definimos las rutas
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Tracking : Screen("tracking", "Grabar", Icons.Default.LocationOn)
     object MapScreen : Screen("map", "Mapa", Icons.Default.Place)
     object Gallery : Screen("gallery", "Galería", Icons.AutoMirrored.Filled.List)
 }
 
-// --- RUTAS CON ARGUMENTOS ---
-const val CAMERA_ROUTE_TEMPLATE = "camera/{tripId}"
-// La URI de la foto es ahora un ARGUMENTO OPCIONAL para poder reutilizar la pantalla
-const val EDIT_TRIP_ROUTE_TEMPLATE = "edit_trip/{tripId}?photoUri={photoUri}"
-const val TRIP_DETAIL_ROUTE_TEMPLATE = "trip_detail/{tripId}"
+// --- Rutas con Argumentos (Estado anterior) ---
+const val CAMERA_ROUTE_TEMPLATE = "camera"
+const val EDIT_TRIP_ROUTE_TEMPLATE = "edit_trip?photoUri={photoUri}" // Solo photoUri
+const val LUGAR_DETAIL_ROUTE_TEMPLATE = "lugar_detail/{lugarId}"
 
 val bottomNavItems = listOf(
     Screen.Tracking,
@@ -83,35 +81,30 @@ fun AppNavigation() {
             composable(Screen.MapScreen.route) { MapScreen() }
             composable(Screen.Gallery.route) { GalleryScreen(navController = navController) }
 
-            composable(
-                route = CAMERA_ROUTE_TEMPLATE,
-                arguments = listOf(navArgument("tripId") { type = NavType.LongType })
-            ) { backStackEntry ->
-                val tripId = backStackEntry.arguments?.getLong("tripId") ?: -1L
-                CameraScreen(navController, tripId)
+            composable(route = CAMERA_ROUTE_TEMPLATE) {
+                CameraScreen(navController)
             }
 
             composable(
                 route = EDIT_TRIP_ROUTE_TEMPLATE,
                 arguments = listOf(
-                    navArgument("tripId") { type = NavType.LongType },
                     navArgument("photoUri") {
                         type = NavType.StringType
-                        nullable = true // Marcamos como opcional
+                        nullable = true
                     }
                 )
             ) { backStackEntry ->
-                val tripId = backStackEntry.arguments?.getLong("tripId") ?: -1L
                 val photoUri = backStackEntry.arguments?.getString("photoUri")
-                EditTripScreen(navController, tripId, photoUri)
+                // La llamada vuelve a ser la simple, sin lugarId
+                EditTripScreen(navController, photoUri)
             }
 
             composable(
-                route = TRIP_DETAIL_ROUTE_TEMPLATE,
-                arguments = listOf(navArgument("tripId") { type = NavType.LongType })
+                route = LUGAR_DETAIL_ROUTE_TEMPLATE,
+                arguments = listOf(navArgument("lugarId") { type = NavType.IntType })
             ) { backStackEntry ->
-                val tripId = backStackEntry.arguments?.getLong("tripId") ?: -1L
-                TripDetailScreen(navController, tripId)
+                val lugarId = backStackEntry.arguments?.getInt("lugarId")?.toLong() ?: -1L
+                TripDetailScreen(navController, lugarId)
             }
         }
     }
