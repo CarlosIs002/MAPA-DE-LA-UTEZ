@@ -1,5 +1,8 @@
 package com.example.gps.ui.detail
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.gps.R
 import com.example.gps.viewmodel.TripDetailViewModel
 import com.utsman.osmandcompose.Marker
 import com.utsman.osmandcompose.OpenStreetMap
@@ -34,6 +40,11 @@ fun TripDetailScreen(
     viewModel: TripDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val resizedIcon = remember(context) {
+        getResizedDrawable(context, R.drawable.locationpoint, 50, 50)
+    }
 
     LaunchedEffect(lugarId) {
         if (lugarId != -1L) {
@@ -111,7 +122,8 @@ fun TripDetailScreen(
                             }
                             OpenStreetMap(cameraState = cameraState) {
                                 Marker(
-                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitud, lugar.longitud))
+                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitud, lugar.longitud)),
+                                    icon = resizedIcon
                                 )
                             }
                         }
@@ -121,7 +133,7 @@ fun TripDetailScreen(
                         Button(
                             onClick = { viewModel.deleteLugar() },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
                             enabled = !uiState.isLoading
                         ) {
                             if (uiState.isLoading) {
@@ -139,7 +151,7 @@ fun TripDetailScreen(
                         Button(
                             onClick = { navController.navigate("edit_place/${lugar.id}") },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(71, 89, 248, 255)),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
                             enabled = !uiState.isLoading
                         ) {
                             if (uiState.isLoading) {
@@ -155,4 +167,11 @@ fun TripDetailScreen(
             }
         }
     }
+}
+
+private fun getResizedDrawable(context: Context, drawableId: Int, width: Int, height: Int): BitmapDrawable {
+    val drawable = ContextCompat.getDrawable(context, drawableId)
+    val bitmap = (drawable as BitmapDrawable).bitmap
+    val resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false)
+    return BitmapDrawable(context.resources, resizedBitmap)
 }
