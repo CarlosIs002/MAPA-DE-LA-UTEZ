@@ -25,7 +25,7 @@ import com.utsman.osmandcompose.rememberCameraState
 import com.utsman.osmandcompose.rememberMarkerState
 import org.osmdroid.util.GeoPoint
 
-private const val BASE_URL = "http://192.168.100.5:5000/"
+private const val BASE_URL = "http://192.168.110.42:5000/"
 
 @Composable
 fun TripDetailScreen(
@@ -48,7 +48,7 @@ fun TripDetailScreen(
     }
 
     Scaffold {
-        padding ->
+            padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
                 uiState.isLoading && uiState.lugar == null -> {
@@ -117,7 +117,7 @@ fun TripDetailScreen(
                         }
 
                         Spacer(modifier = Modifier.height(32.dp))
-                        
+
                         Button(
                             onClick = { viewModel.deleteLugar() },
                             modifier = Modifier.fillMaxWidth(),
@@ -142,7 +142,7 @@ fun TripDetailScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(71, 89, 248, 255)),
                             enabled = !uiState.isLoading
                         ) {
-                             if (uiState.isLoading) {
+                            if (uiState.isLoading) {
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onError)
                             } else {
                                 Icon(Icons.Default.Create, contentDescription = "Editar")

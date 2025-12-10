@@ -21,7 +21,7 @@ import coil.compose.AsyncImage
 import com.example.gps.data.network.Lugar
 import com.example.gps.viewmodel.GalleryViewModel
 
-private const val BASE_URL = "http://192.168.100.5:5000"
+private const val BASE_URL = "http://192.168.110.42:5000/"
 
 @Composable
 fun GalleryScreen(
