@@ -7,8 +7,11 @@ data class Lugar(
     @SerializedName("id")
     val id: Int,
 
-    @SerializedName("nombre")
-    val title: String,
+    @SerializedName("docencia")
+    val docencia: String,
+
+    @SerializedName("salon")
+    val salon: String,
 
     @SerializedName("descripcion")
     val description: String,

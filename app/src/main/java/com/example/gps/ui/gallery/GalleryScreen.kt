@@ -107,7 +107,7 @@ fun LugarGridItem(navController: NavController, lugar: Lugar) {
 
         AsyncImage(
             model = imageUrl,
-            contentDescription = lugar.title,
+            contentDescription = lugar.docencia,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

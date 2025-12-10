@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,7 +73,7 @@ fun TripDetailScreen(
                         val imageUrl = "$BASE_URL${lugar.imageUrl}"
                         AsyncImage(
                             model = imageUrl,
-                            contentDescription = lugar.title,
+                            contentDescription = lugar.docencia,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16 / 9f)
@@ -81,7 +83,9 @@ fun TripDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(text = lugar.title, style = MaterialTheme.typography.headlineLarge)
+                        Text(text = lugar.docencia, style = MaterialTheme.typography.headlineLarge)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = lugar.salon, style = MaterialTheme.typography.headlineLarge)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(text = lugar.description, style = MaterialTheme.typography.bodyLarge)
 
@@ -117,6 +121,26 @@ fun TripDetailScreen(
                                 Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("Eliminar")
+                            }
+                        }
+                        Button(
+                            onClick = { viewModel.deleteLugar() },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(
+                                71,
+                                89,
+                                248,
+                                255
+                            )
+                            ),
+                            enabled = !uiState.isLoading
+                        ) {
+                            if (uiState.isLoading) {
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.onError)
+                            } else {
+                                Icon(Icons.Default.Create, contentDescription = "Editar")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Editar")
                             }
                         }
                     }

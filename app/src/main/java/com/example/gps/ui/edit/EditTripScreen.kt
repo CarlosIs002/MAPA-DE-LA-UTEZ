@@ -97,7 +97,16 @@ fun EditTripScreen(
             OutlinedTextField(
                 value = uiState.titulo,
                 onValueChange = { viewModel.onTituloChange(it) },
-                label = { Text("Título") },
+                label = { Text("Docencia") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = uiState.descripcion,
+                onValueChange = { viewModel.onDescripcionChange(it) },
+                label = { Text("Salon") },
                 modifier = Modifier.fillMaxWidth()
             )
 

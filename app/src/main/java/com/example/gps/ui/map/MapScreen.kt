@@ -42,7 +42,7 @@ fun MapScreen(
             ModalDrawerSheet {
                 selectedLugar?.let { lugar ->
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(lugar.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(lugar.docencia, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                         Divider(modifier = Modifier.padding(vertical = 8.dp))
                         Text(lugar.description)
                     }
@@ -65,7 +65,7 @@ fun MapScreen(
                     val geoPoint = GeoPoint(lugar.latitude, lugar.longitude)
                     Marker(
                         state = rememberMarkerState(geoPoint = geoPoint),
-                        title = lugar.title,
+                        title = lugar.docencia,
                         onClick = {
                             selectedLugar = lugar
                             scope.launch { drawerState.open() }
