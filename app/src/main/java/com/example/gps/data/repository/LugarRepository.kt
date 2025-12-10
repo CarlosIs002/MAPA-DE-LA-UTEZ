@@ -24,20 +24,26 @@ class LugarRepository(private val context: Context) {
         return apiService.getLugar(id)
     }
 
-    suspend fun createLugar(nombre: String, descripcion: String, imageUri: Uri, latitud: Double, longitud: Double) {
+    suspend fun createLugar(nombre: String, salon: String, descripcion: String, imageUri: Uri, latitud: Double, longitud: Double) {
         val file = getFileFromUri(imageUri)
 
         val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val imagePart = MultipartBody.Part.createFormData("imagen", file.name, requestFile)
 
         val nombrePart = nombre.toRequestBody("text/plain".toMediaTypeOrNull())
+        val salonPart = salon.toRequestBody("text/plain".toMediaTypeOrNull())
         val descripcionPart = descripcion.toRequestBody("text/plain".toMediaTypeOrNull())
         val latitudPart = latitud.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val longitudPart = longitud.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
-        apiService.createLugar(nombrePart, descripcionPart, latitudPart, longitudPart, imagePart)
+        apiService.createLugar(nombrePart, salonPart, descripcionPart, latitudPart, longitudPart, imagePart)
 
         file.delete()
+    }
+
+    // Nueva función para llamar al servicio de actualización
+    suspend fun actualizarLugar(id: Int, nombre: String, salon: String, descripcion: String) {
+        apiService.actualizarLugar(id, nombre, salon, descripcion)
     }
 
     suspend fun deleteLugar(id: Int) {

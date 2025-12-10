@@ -21,7 +21,7 @@ import coil.compose.AsyncImage
 import com.example.gps.data.network.Lugar
 import com.example.gps.viewmodel.GalleryViewModel
 
-private const val BASE_URL = "http://192.168.107.157:5000"
+private const val BASE_URL = "http://192.168.100.5:5000"
 
 @Composable
 fun GalleryScreen(
@@ -107,7 +107,7 @@ fun LugarGridItem(navController: NavController, lugar: Lugar) {
 
         AsyncImage(
             model = imageUrl,
-            contentDescription = lugar.docencia,
+            contentDescription = lugar.title,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

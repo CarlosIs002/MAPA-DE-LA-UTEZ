@@ -73,7 +73,7 @@ fun TripDetailScreen(
                         val imageUrl = "$BASE_URL${lugar.imageUrl}"
                         AsyncImage(
                             model = imageUrl,
-                            contentDescription = lugar.docencia,
+                            contentDescription = lugar.title,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16 / 9f)
@@ -83,11 +83,21 @@ fun TripDetailScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        Text(text = lugar.docencia, style = MaterialTheme.typography.headlineLarge)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = lugar.salon, style = MaterialTheme.typography.headlineLarge)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(text = lugar.description, style = MaterialTheme.typography.bodyLarge)
+                        Text(text = lugar.title, style = MaterialTheme.typography.headlineLarge)
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        if (!lugar.salon.isNullOrBlank()) {
+                            Text(
+                                text = "Salón: ${lugar.salon}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+
+                        if (!lugar.descripcion.isNullOrBlank()) {
+                            Text(text = lugar.descripcion, style = MaterialTheme.typography.bodyLarge)
+                        }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -96,19 +106,18 @@ fun TripDetailScreen(
                             elevation = CardDefaults.cardElevation(4.dp)
                         ) {
                             val cameraState = rememberCameraState {
-                                geoPoint = GeoPoint(lugar.latitude, lugar.longitude)
+                                geoPoint = GeoPoint(lugar.latitud, lugar.longitud)
                                 zoom = 16.0
                             }
                             OpenStreetMap(cameraState = cameraState) {
                                 Marker(
-                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitude, lugar.longitude))
+                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitud, lugar.longitud))
                                 )
                             }
                         }
 
                         Spacer(modifier = Modifier.height(32.dp))
-
-                        // Solo el botón de Eliminar
+                        
                         Button(
                             onClick = { viewModel.deleteLugar() },
                             modifier = Modifier.fillMaxWidth(),
@@ -123,19 +132,17 @@ fun TripDetailScreen(
                                 Text("Eliminar")
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // --- BOTÓN EDITAR ACTIVADO ---
                         Button(
-                            onClick = { viewModel.deleteLugar() },
+                            onClick = { navController.navigate("edit_place/${lugar.id}") },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(
-                                71,
-                                89,
-                                248,
-                                255
-                            )
-                            ),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(71, 89, 248, 255)),
                             enabled = !uiState.isLoading
                         ) {
-                            if (uiState.isLoading) {
+                             if (uiState.isLoading) {
                                 CircularProgressIndicator(color = MaterialTheme.colorScheme.onError)
                             } else {
                                 Icon(Icons.Default.Create, contentDescription = "Editar")

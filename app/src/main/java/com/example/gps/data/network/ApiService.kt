@@ -17,10 +17,20 @@ interface ApiService {
     @POST("lugares")
     suspend fun createLugar(
         @Part("nombre") nombre: RequestBody,
+        @Part("salon") salon: RequestBody,
         @Part("descripcion") descripcion: RequestBody,
         @Part("latitud") latitud: RequestBody,
         @Part("longitud") longitud: RequestBody,
         @Part imagen: MultipartBody.Part
+    ): Response<Unit>
+
+    @FormUrlEncoded
+    @PUT("lugares/{id}")
+    suspend fun actualizarLugar(
+        @Path("id") id: Int,
+        @Field("nombre") nombre: String,
+        @Field("salon") salon: String,
+        @Field("descripcion") descripcion: String
     ): Response<Unit>
 
     @DELETE("lugares/{id}")

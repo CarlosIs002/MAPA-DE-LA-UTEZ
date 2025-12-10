@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gps.ui.camera.CameraScreen
 import com.example.gps.ui.detail.TripDetailScreen
+import com.example.gps.ui.edit.EditPlaceScreen
 import com.example.gps.ui.edit.EditTripScreen
 import com.example.gps.ui.gallery.GalleryScreen
 import com.example.gps.ui.map.MapScreen
@@ -35,10 +36,11 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Gallery : Screen("gallery", "Galería", Icons.AutoMirrored.Filled.List)
 }
 
-// --- Rutas con Argumentos (Estado anterior) ---
+// --- RUTAS CON ARGUMENTOS ---
 const val CAMERA_ROUTE_TEMPLATE = "camera"
-const val EDIT_TRIP_ROUTE_TEMPLATE = "edit_trip?photoUri={photoUri}" // Solo photoUri
+const val EDIT_TRIP_ROUTE_TEMPLATE = "edit_trip?photoUri={photoUri}"
 const val LUGAR_DETAIL_ROUTE_TEMPLATE = "lugar_detail/{lugarId}"
+const val EDIT_PLACE_ROUTE_TEMPLATE = "edit_place/{lugarId}" // <-- NUEVA RUTA
 
 val bottomNavItems = listOf(
     Screen.Tracking,
@@ -88,14 +90,10 @@ fun AppNavigation() {
             composable(
                 route = EDIT_TRIP_ROUTE_TEMPLATE,
                 arguments = listOf(
-                    navArgument("photoUri") {
-                        type = NavType.StringType
-                        nullable = true
-                    }
+                    navArgument("photoUri") { type = NavType.StringType; nullable = true }
                 )
             ) { backStackEntry ->
                 val photoUri = backStackEntry.arguments?.getString("photoUri")
-                // La llamada vuelve a ser la simple, sin lugarId
                 EditTripScreen(navController, photoUri)
             }
 
@@ -105,6 +103,17 @@ fun AppNavigation() {
             ) { backStackEntry ->
                 val lugarId = backStackEntry.arguments?.getInt("lugarId")?.toLong() ?: -1L
                 TripDetailScreen(navController, lugarId)
+            }
+
+            // <-- NUEVO COMPOSABLE PARA LA PANTALLA DE EDICIÓN
+            composable(
+                route = EDIT_PLACE_ROUTE_TEMPLATE,
+                arguments = listOf(navArgument("lugarId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val lugarId = backStackEntry.arguments?.getInt("lugarId") ?: -1
+                if (lugarId != -1) {
+                    EditPlaceScreen(navController, lugarId)
+                }
             }
         }
     }

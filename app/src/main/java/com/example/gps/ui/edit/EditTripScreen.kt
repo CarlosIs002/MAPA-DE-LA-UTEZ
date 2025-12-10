@@ -27,7 +27,7 @@ import com.google.android.gms.location.LocationServices
 @Composable
 fun EditTripScreen(
     navController: NavController,
-    photoUri: String?, // Solo recibe photoUri
+    photoUri: String?,
     viewModel: EditTripViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -103,15 +103,17 @@ fun EditTripScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // <-- CAMPO "SALON" CORREGIDO
             OutlinedTextField(
-                value = uiState.descripcion,
-                onValueChange = { viewModel.onDescripcionChange(it) },
+                value = uiState.salon,
+                onValueChange = { viewModel.onSalonChange(it) },
                 label = { Text("Salon") },
                 modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // <-- CAMPO "DESCRIPCIÓN" ÚNICO Y CORRECTO
             OutlinedTextField(
                 value = uiState.descripcion,
                 onValueChange = { viewModel.onDescripcionChange(it) },

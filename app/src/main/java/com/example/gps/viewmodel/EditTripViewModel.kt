@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
 
-// Estado simplificado solo para la creación
 data class EditTripUiState(
     val titulo: String = "",
+    val salon: String = "", // <-- NUEVO CAMPO PARA EL SALÓN
     val descripcion: String = "",
     val imageUri: Uri? = null,
     val currentLocation: Location? = null,
@@ -33,6 +32,11 @@ class EditTripViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(titulo = newTitulo) }
     }
 
+    // <-- NUEVA FUNCIÓN PARA ACTUALIZAR EL SALÓN
+    fun onSalonChange(newSalon: String) {
+        _uiState.update { it.copy(salon = newSalon) }
+    }
+
     fun onDescripcionChange(newDescripcion: String) {
         _uiState.update { it.copy(descripcion = newDescripcion) }
     }
@@ -45,7 +49,6 @@ class EditTripViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(currentLocation = newLocation) }
     }
 
-    // La función solo sabe crear un registro
     fun saveTrip() {
         val currentState = _uiState.value
         val uri = currentState.imageUri
@@ -61,6 +64,7 @@ class EditTripViewModel(application: Application) : AndroidViewModel(application
             try {
                 repository.createLugar(
                     nombre = currentState.titulo,
+                    salon = currentState.salon, // <-- PASAMOS EL NUEVO CAMPO
                     descripcion = currentState.descripcion,
                     imageUri = uri,
                     latitud = location.latitude,
