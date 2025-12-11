@@ -4,8 +4,8 @@
 
 ## Equipo de Desarrollo
 
-- Barrera Villareal Carlos Israel | [[Backend, Fronend]] | @CarlosIs002 |
-- Jaimes Pereira Emmanuel | [Backend, Fronend] | @lolxdr23 |
+- Barrera Villareal Carlos Israel | [[Backend, Frontend]] | @CarlosIs002 |
+- Jaimes Pereira Emmanuel | [Backend, Frontend] | @lolxdr23 |
 - Rosales Hernandez Edgar | [Backend, Retrofit] | @Edgar-alt423 |
 
 ---
@@ -33,9 +33,14 @@ Este proyecto ha sido desarrollado siguiendo estrictamente los lineamientos de l
 ---
 
 ## Capturas de Pantalla
-| Pantalla de Inicio | Operación CRUD | Uso del Sensor |
+|| Pantalla de Inicio | Operación CRUD | Uso del Sensor |
 | :---: | :---: | :---: |
-| ![Inicio](https://github.com/user-attachments/assets/936094ab-d176-4408-a86f-893ed7874212) | ![CRUD] ![CREATE](https://github.com/user-attachments/assets/b51a0829-6fdc-490f-8ada-da67efacfd18)) ![READ](https://github.com/user-attachments/assets/0c9a6e7e-d51c-4adf-b08a-a43e344ee4cd) ![UPDATE](https://github.com/user-attachments/assets/4b449be4-0cf5-41c3-af14-054801e3da3f) ![DELETE](https://github.com/user-attachments/assets/0c9a6e7e-d51c-4adf-b08a-a43e344ee4cd) | ![Sensor] ![1000112904](https://github.com/user-attachments/assets/92683267-3762-41ca-b131-d8caf3a8f937) |
+| ![Inicio](https://github.com/user-attachments/assets/936094ab-d176-4408-a86f-893ed7874212) | 
+  <img src="https://github.com/user-attachments/assets/b51a0829-6fdc-490f-8ada-da67efacfd18" width="150" alt="CREATE">
+  <img src="https://github.com/user-attachments/assets/0c9a6e7e-d51c-4adf-b08a-a43e344ee4cd" width="150" alt="READ">
+  <img src="https://github.com/user-attachments/assets/4b449be4-0cf5-41c3-af14-054801e3da3f" width="150" alt="UPDATE">
+  <img src="https://github.com/user-attachments/assets/0c9a6e7e-d51c-4adf-b08a-a43e344ee4cd" width="150" alt="DELETE">
+| ![Sensor] ![1000112904](https://github.com/user-attachments/assets/92683267-3762-41ca-b131-d8caf3a8f937) |
 ## Instalación y Releases
 
 El ejecutable firmado (.apk) se encuentra disponible en la sección de **Releases** de este repositorio.
