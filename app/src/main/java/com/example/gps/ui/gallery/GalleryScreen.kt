@@ -52,7 +52,7 @@ fun GalleryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Galería de Recorridos") },
+                title = { Text("Galería de Reportes") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
