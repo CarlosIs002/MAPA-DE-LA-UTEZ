@@ -1,5 +1,6 @@
 package com.example.gps.ui.gallery
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -9,9 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -22,6 +26,7 @@ import com.example.gps.data.network.Lugar
 import com.example.gps.data.network.RetrofitClient
 import com.example.gps.viewmodel.GalleryViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryScreen(
     navController: NavController,
@@ -32,57 +37,61 @@ fun GalleryScreen(
     val error by viewModel.error.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // --- SOLUCIÓN DE REFRESCO AUTOMÁTICO ---
-    // DisposableEffect se asegura de que el observador se añada y se quite correctamente.
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            // Si el evento es ON_RESUME, la pantalla se ha vuelto a mostrar.
             if (event == Lifecycle.Event.ON_RESUME) {
-                // Le pedimos al ViewModel que vuelva a cargar los lugares.
                 viewModel.loadLugares()
             }
         }
-
-        // Añadimos el observador al ciclo de vida.
         lifecycleOwner.lifecycle.addObserver(observer)
-
-        // onDispose se llama cuando la pantalla se va a destruir.
         onDispose {
-            // Quitamos el observador para evitar fugas de memoria.
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
-    Scaffold {
-        padding ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Galería de Recorridos") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             when {
-                // Muestra el indicador de carga solo si la lista está vacía al principio.
                 isLoading && lugares.isEmpty() -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 error != null -> {
                     Text(
                         text = error!!,
-                        modifier = Modifier.align(Alignment.Center),
-                        textAlign = TextAlign.Center
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
                 lugares.isEmpty() -> {
                     Text(
-                        text = "No hay lugares guardados.",
-                        modifier = Modifier.align(Alignment.Center)
+                        text = "No hay lugares guardados. ¡Empieza a grabar un recorrido!",
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
                 else -> {
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 128.dp),
+                        columns = GridCells.Adaptive(minSize = 150.dp),
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        contentPadding = PaddingValues(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(lugares) { lugar ->
                             LugarGridItem(navController, lugar)
@@ -102,13 +111,38 @@ fun LugarGridItem(navController: NavController, lugar: Lugar) {
             .aspectRatio(1f)
             .clickable { navController.navigate("lugar_detail/${lugar.id}") }
     ) {
-        val imageUrl = "${RetrofitClient.BASE_URL}${lugar.imageUrl}"
-
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = lugar.title,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            val imageUrl = "${RetrofitClient.BASE_URL}${lugar.imageUrl}"
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = lugar.title,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 300f
+                        )
+                    )
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Text(
+                    text = lugar.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
     }
 }

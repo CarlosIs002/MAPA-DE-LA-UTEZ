@@ -4,33 +4,33 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.gps.viewmodel.TrackingViewModel
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackingScreen(
-    navController: NavController,
-    viewModel: TrackingViewModel = viewModel()
+    navController: NavController
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     // --- Lógica de Permisos ---
     val permissionsToRequest = arrayOf(
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -42,7 +42,8 @@ fun TrackingScreen(
         onResult = { permissions ->
             val allGranted = permissions.values.all { it }
             if (!allGranted) {
-                // Manejar permisos denegados
+                // Opcional: Manejar la denegación de permisos.
+                // Podrías mostrar un mensaje al usuario.
             }
         }
     )
@@ -53,36 +54,43 @@ fun TrackingScreen(
     }
 
     // --- UI ---
-    Scaffold { padding ->
-        Column(
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Crear Nuevo Reporte") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            )
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate("camera") },
+                icon = { Icon(Icons.Default.CameraAlt, contentDescription = "Tomar foto") },
+                text = { Text("Tomar Reporte") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    ) { innerPadding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding),
+            contentAlignment = Alignment.Center
         ) {
-            Button(
-                onClick = {
-                    if (uiState.isRecording) {
-                        // 1. Si está grabando, paramos lógicamente
-                        viewModel.onStartStopClick()
-                        // 2. Navegamos a la cámara. La ruta ya no necesita el ID.
-                        navController.navigate("camera")
-                    } else {
-                        // Si no está grabando, empezamos
-                        viewModel.onStartStopClick()
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (uiState.isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                ),
-                modifier = Modifier.padding(16.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(horizontal = 32.dp)
             ) {
-                Text(if (uiState.isRecording) "Detener y tomar foto" else "Iniciar Grabación")
-            }
-
-            if (uiState.isRecording) {
-                Text("Grabando recorrido...")
+                Text(
+                    "Presiona 'Tomar Reporte' para registrar una nueva incidencia con foto y ubicación.",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }

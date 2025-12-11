@@ -3,7 +3,7 @@ package com.example.gps.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.AddLocationAlt
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -31,7 +31,7 @@ import com.example.gps.ui.map.MapScreen
 import com.example.gps.ui.tracking.TrackingScreen
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    object Tracking : Screen("tracking", "Grabar", Icons.Default.LocationOn)
+    object Tracking : Screen("tracking", "Reporte", Icons.Default.AddLocationAlt)
     object MapScreen : Screen("map", "Mapa", Icons.Default.Place)
     object Gallery : Screen("gallery", "Galería", Icons.AutoMirrored.Filled.List)
 }
@@ -40,7 +40,7 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
 const val CAMERA_ROUTE_TEMPLATE = "camera"
 const val EDIT_TRIP_ROUTE_TEMPLATE = "edit_trip?photoUri={photoUri}"
 const val LUGAR_DETAIL_ROUTE_TEMPLATE = "lugar_detail/{lugarId}"
-const val EDIT_PLACE_ROUTE_TEMPLATE = "edit_place/{lugarId}" // <-- NUEVA RUTA
+const val EDIT_PLACE_ROUTE_TEMPLATE = "edit_place/{lugarId}"
 
 val bottomNavItems = listOf(
     Screen.Tracking,
@@ -101,11 +101,10 @@ fun AppNavigation() {
                 route = LUGAR_DETAIL_ROUTE_TEMPLATE,
                 arguments = listOf(navArgument("lugarId") { type = NavType.IntType })
             ) { backStackEntry ->
-                val lugarId = backStackEntry.arguments?.getInt("lugarId")?.toLong() ?: -1L
+                val lugarId = backStackEntry.arguments?.getInt("lugarId") ?: -1
                 TripDetailScreen(navController, lugarId)
             }
 
-            // <-- NUEVO COMPOSABLE PARA LA PANTALLA DE EDICIÓN
             composable(
                 route = EDIT_PLACE_ROUTE_TEMPLATE,
                 arguments = listOf(navArgument("lugarId") { type = NavType.IntType })

@@ -53,4 +53,8 @@ class TripDetailViewModel(application: Application) : AndroidViewModel(applicati
             }
         }
     }
+    
+    fun onNavigationDone() {
+        _uiState.update { it.copy(navigateBack = false) }
+    }
 }
