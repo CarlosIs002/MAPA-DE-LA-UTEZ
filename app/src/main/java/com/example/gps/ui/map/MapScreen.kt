@@ -3,7 +3,6 @@ package com.example.gps.ui.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -62,12 +61,12 @@ fun MapScreen(
     val fixedMarkers = remember {
         listOf(
             FixedMarker(GeoPoint(18.850454, -99.201372), "Rectoria", listOf("Control Escolar", "Finanzas", "Dirección Académica")),
-            FixedMarker(GeoPoint(18.851396, -99.200873), "Docencia 1", listOf("Salón 101", "Salón 102", "Salón 103", "Auditorio")),
             FixedMarker(GeoPoint(18.852418, -99.200156), "Docencia 4", listOf("Salones de clase")),
             FixedMarker(GeoPoint(18.852115, -99.200133), "Docencia 3", listOf("Salones de clase")),
+            FixedMarker(GeoPoint(18.852467, -99.200729), "CEDIM", listOf("Centro de Desarrollo e Innovación")),
             FixedMarker(GeoPoint(18.852144, -99.200995), "Docencia 5", listOf("Salones de clase")),
             FixedMarker(GeoPoint(18.851806, -99.200945), "Docencia 2", listOf("Laboratorio de Redes", "Laboratorio de Software", "Salón 201")),
-            FixedMarker(GeoPoint(18.852467, -99.200729), "CEDIM", listOf("Centro de Desarrollo e Innovación")),
+            FixedMarker(GeoPoint(18.851396, -99.200873), "Docencia 1", listOf("Salón 101", "Salón 102", "Salón 103", "Auditorio")),
             FixedMarker(GeoPoint(18.851041, -99.200495), "Taller Pesado 1", listOf("Talleres y laboratorios")),
             FixedMarker(GeoPoint(18.850149, -99.200062), "Taller Pesado 2", listOf("Talleres y laboratorios")),
             FixedMarker(GeoPoint(18.850595, -99.200671), "Biblioteca", listOf("Préstamo de libros", "Sala de estudio")),
@@ -100,7 +99,7 @@ fun MapScreen(
     ) { paddingValues ->
         val cameraState = rememberCameraState {
             geoPoint = GeoPoint(18.851252, -99.201060) // UTEZ
-            zoom = 18.0
+            zoom = 18.8
         }
 
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
@@ -144,7 +143,9 @@ fun MapScreen(
                 }
             }
 
-            if (selectedMarkerInfo != null) {
+            // Copia local y estable de la información del marcador seleccionado
+            val currentInfo = selectedMarkerInfo
+            if (currentInfo != null) {
                 ModalBottomSheet(
                     onDismissRequest = { scope.launch { sheetState.hide() } },
                     sheetState = sheetState
@@ -156,7 +157,7 @@ fun MapScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = selectedMarkerInfo!!.title,
+                            text = currentInfo.title,
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -166,18 +167,18 @@ fun MapScreen(
                     LazyColumn(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     ) {
-                        items(selectedMarkerInfo!!.details) { detail ->
+                        items(currentInfo.details) { detail ->
                             ListItem(
                                 headlineContent = { Text(detail) }
                             )
                         }
                     }
 
-                    if (selectedMarkerInfo!!.isFromDb) {
+                    if (currentInfo.isFromDb) {
                         Button(
                             onClick = { 
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    selectedMarkerInfo?.id?.let { navController.navigate("lugar_detail/$it") }
+                                    currentInfo.id?.let { navController.navigate("lugar_detail/$it") }
                                 }
                              },
                             modifier = Modifier.fillMaxWidth().padding(16.dp)
