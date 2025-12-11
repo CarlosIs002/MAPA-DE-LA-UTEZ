@@ -2,9 +2,9 @@ package com.example.gps.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.AddLocationAlt
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.automirrored.filled.Article
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -31,9 +31,9 @@ import com.example.gps.ui.map.MapScreen
 import com.example.gps.ui.tracking.TrackingScreen
 
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
-    object Tracking : Screen("tracking", "Reporte", Icons.Default.AddLocationAlt)
-    object MapScreen : Screen("map", "Mapa", Icons.Default.Place)
-    object Gallery : Screen("gallery", "Galería", Icons.AutoMirrored.Filled.List)
+    object Inicio : Screen("inicio", "Inicio", Icons.Default.Home)
+    object Mapa : Screen("mapa", "Mapa", Icons.Default.Map)
+    object Reportes : Screen("reportes", "Reportes", Icons.AutoMirrored.Filled.Article)
 }
 
 // --- RUTAS CON ARGUMENTOS ---
@@ -43,9 +43,9 @@ const val LUGAR_DETAIL_ROUTE_TEMPLATE = "lugar_detail/{lugarId}"
 const val EDIT_PLACE_ROUTE_TEMPLATE = "edit_place/{lugarId}"
 
 val bottomNavItems = listOf(
-    Screen.Tracking,
-    Screen.MapScreen,
-    Screen.Gallery
+    Screen.Inicio,
+    Screen.Mapa,
+    Screen.Reportes
 )
 
 @Composable
@@ -59,7 +59,7 @@ fun AppNavigation() {
                 val currentDestination = navBackStackEntry?.destination
                 bottomNavItems.forEach { screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = null) },
+                        icon = { Icon(screen.icon, contentDescription = screen.label) },
                         label = { Text(screen.label) },
                         selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                         onClick = {
@@ -76,12 +76,12 @@ fun AppNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Tracking.route,
+            startDestination = Screen.Inicio.route, // <-- RUTA INICIAL CAMBIADA
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Tracking.route) { TrackingScreen(navController = navController) }
-            composable(Screen.MapScreen.route) { MapScreen() }
-            composable(Screen.Gallery.route) { GalleryScreen(navController = navController) }
+            composable(Screen.Inicio.route) { TrackingScreen(navController = navController) }
+            composable(Screen.Mapa.route) { MapScreen(navController = navController) }
+            composable(Screen.Reportes.route) { GalleryScreen(navController = navController) }
 
             composable(route = CAMERA_ROUTE_TEMPLATE) {
                 CameraScreen(navController)
