@@ -1,4 +1,3 @@
-
 package com.example.gps.data.network
 
 import okhttp3.OkHttpClient
@@ -8,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://192.168.110.42:5000/"
+    const val BASE_URL = "http://192.168.0.14:5000/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

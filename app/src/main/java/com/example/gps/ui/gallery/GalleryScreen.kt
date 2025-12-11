@@ -19,9 +19,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.gps.data.network.Lugar
+import com.example.gps.data.network.RetrofitClient
 import com.example.gps.viewmodel.GalleryViewModel
-
-private const val BASE_URL = "http://192.168.110.42:5000/"
 
 @Composable
 fun GalleryScreen(
@@ -103,7 +102,7 @@ fun LugarGridItem(navController: NavController, lugar: Lugar) {
             .aspectRatio(1f)
             .clickable { navController.navigate("lugar_detail/${lugar.id}") }
     ) {
-        val imageUrl = "$BASE_URL${lugar.imageUrl}"
+        val imageUrl = "${RetrofitClient.BASE_URL}${lugar.imageUrl}"
 
         AsyncImage(
             model = imageUrl,

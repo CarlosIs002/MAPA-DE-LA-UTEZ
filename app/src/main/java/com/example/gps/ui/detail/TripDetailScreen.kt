@@ -1,8 +1,5 @@
 package com.example.gps.ui.detail
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,22 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.gps.R
+import com.example.gps.data.network.RetrofitClient
 import com.example.gps.viewmodel.TripDetailViewModel
 import com.utsman.osmandcompose.Marker
 import com.utsman.osmandcompose.OpenStreetMap
 import com.utsman.osmandcompose.rememberCameraState
 import com.utsman.osmandcompose.rememberMarkerState
 import org.osmdroid.util.GeoPoint
-
-private const val BASE_URL = "http://192.168.110.42:5000/"
 
 @Composable
 fun TripDetailScreen(
@@ -40,11 +33,6 @@ fun TripDetailScreen(
     viewModel: TripDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
-
-    val resizedIcon = remember(context) {
-        getResizedDrawable(context, R.drawable.locationpoint, 50, 50)
-    }
 
     LaunchedEffect(lugarId) {
         if (lugarId != -1L) {
@@ -59,7 +47,7 @@ fun TripDetailScreen(
     }
 
     Scaffold {
-            padding ->
+        padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
                 uiState.isLoading && uiState.lugar == null -> {
@@ -81,7 +69,7 @@ fun TripDetailScreen(
                             .padding(16.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        val imageUrl = "$BASE_URL${lugar.imageUrl}"
+                        val imageUrl = "${RetrofitClient.BASE_URL}${lugar.imageUrl}"
                         AsyncImage(
                             model = imageUrl,
                             contentDescription = lugar.title,
@@ -122,18 +110,18 @@ fun TripDetailScreen(
                             }
                             OpenStreetMap(cameraState = cameraState) {
                                 Marker(
-                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitud, lugar.longitud)),
-                                    icon = resizedIcon
+                                    state = rememberMarkerState(geoPoint = GeoPoint(lugar.latitud, lugar.longitud))
                                 )
                             }
                         }
 
                         Spacer(modifier = Modifier.height(32.dp))
 
+
                         Button(
                             onClick = { viewModel.deleteLugar() },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                             enabled = !uiState.isLoading
                         ) {
                             if (uiState.isLoading) {
@@ -151,7 +139,7 @@ fun TripDetailScreen(
                         Button(
                             onClick = { navController.navigate("edit_place/${lugar.id}") },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(71, 89, 248, 255)),
                             enabled = !uiState.isLoading
                         ) {
                             if (uiState.isLoading) {
@@ -167,11 +155,4 @@ fun TripDetailScreen(
             }
         }
     }
-}
-
-private fun getResizedDrawable(context: Context, drawableId: Int, width: Int, height: Int): BitmapDrawable {
-    val drawable = ContextCompat.getDrawable(context, drawableId)
-    val bitmap = (drawable as BitmapDrawable).bitmap
-    val resizedBitmap = Bitmap.createScaledBitmap(bitmap, width, height, false)
-    return BitmapDrawable(context.resources, resizedBitmap)
 }
